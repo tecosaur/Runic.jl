@@ -24,7 +24,6 @@ function Base.showerror(io::IO, err::AssertionError)
             "please file an issue with a reproducible example at " *
             "https://github.com/fredrikekre/Runic.jl/issues/new."
     )
-    return
 end
 
 macro assert(expr)

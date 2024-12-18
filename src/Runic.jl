@@ -70,7 +70,6 @@ function Base.show(io::IO, ::MIME"text/plain", node::Node)
     show(io, node)
     println(io)
     _show_green_node(io, node, "", 1, nothing, true)
-    return
 end
 
 function Base.show(io::IO, node::Node)
@@ -149,7 +148,6 @@ mutable struct Context
     next_sibling::Union{Node, Nothing}
     # parent::Union{Node, Nothing}
     lineage_kinds::Vector{JuliaSyntax.Kind}
-    lineage_macros::Vector{String}
 end
 
 const RANGE_FORMATTING_BEGIN = "#= RUNIC RANGE FORMATTING " * "BEGIN =#"
@@ -276,12 +274,11 @@ function Context(
     call_depth = 0
     prev_sibling = next_sibling = nothing
     lineage_kinds = JuliaSyntax.Kind[]
-    lineage_macros = String[]
     format_on = true
     return Context(
         src_str, src_tree, src_io, fmt_io, fmt_tree, quiet, verbose, assert, debug, check,
         diff, filemode, filename, line_ranges, indent_level, call_depth, format_on,
-        prev_sibling, next_sibling, lineage_kinds, lineage_macros
+        prev_sibling, next_sibling, lineage_kinds
     )
 end
 
@@ -416,9 +413,6 @@ function format_node_with_kids!(ctx::Context, node::Node)
     ctx.prev_sibling = nothing
     ctx.next_sibling = nothing
     push!(ctx.lineage_kinds, kind(node))
-    if kind(node) === K"macrocall"
-        push!(ctx.lineage_macros, macrocall_name(ctx, node))
-    end
 
     # The new node parts. `kids′` aliases `kids` and only copied below if any of the
     # nodes change ("copy-on-write").
@@ -494,9 +488,6 @@ function format_node_with_kids!(ctx::Context, node::Node)
     ctx.prev_sibling = prev_sibling
     ctx.next_sibling = next_sibling
     pop!(ctx.lineage_kinds)
-    if kind(node) === K"macrocall"
-        pop!(ctx.lineage_macros)
-    end
     ctx.call_depth -= 1
     # Return a new node if any of the kids changed
     if any_kid_changed
@@ -553,7 +544,6 @@ function format_node!(ctx::Context, node::Node)::Union{Node, Nothing, NullNode}
     @return_something no_spaces_around_colon_etc(ctx, node)
     @return_something parens_around_op_calls_in_colon(ctx, node)
     @return_something for_loop_use_in(ctx, node)
-    @return_something explicit_return(ctx, node)
     @return_something braces_around_where_rhs(ctx, node)
     @return_something indent_multiline_strings(ctx, node)
     @return_something four_space_indent(ctx, node)
