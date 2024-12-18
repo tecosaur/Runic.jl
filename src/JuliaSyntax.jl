@@ -48,5 +48,4 @@ function _show_green_node(io, node, indent, pos, str, show_trivia)
             p += x.span
         end
     end
-    return
 end
