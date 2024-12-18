@@ -1,3 +1,14 @@
+# Runic.jl, with adjustments
+
+This is a fork of Runic, which almost has a set of formatting rules I can live with.
+
+Divergences:
+- No `return` insertion ([feature](https://github.com/fredrikekre/Runic.jl/pull/48), [revert](https://github.com/tecosaur/Runic.jl/commit/3368d8ba7300ee37991406e0b71147c4008fc53a))
+
+Original README below.
+
+------
+
 # Runic.jl
 
 *A code formatter with rules set in stone.*
